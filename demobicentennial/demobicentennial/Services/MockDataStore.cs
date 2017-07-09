@@ -2,28 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
+using System.Net.Http;
 namespace demobicentennial
 {
     public class MockDataStore : IDataStore<Item>
     {
+        HttpClient client;
         bool isInitialized;
         List<Item> items;
 
         public MockDataStore()
         {
-            items = new List<Item>();
+			client = new HttpClient();
+			client.BaseAddress = new Uri($"http://matrixrevolutions.ddns.net:8080/");
+
             var _items = new List<Item>
             {
-                new Item { Id = Guid.NewGuid().ToString(), Text = "First item", Description="This is a nice description"},
+                new Item { Id = Guid.NewGuid().ToString(), Text = "First item", Description="This is a nice description"}
+                /*,
                 new Item { Id = Guid.NewGuid().ToString(), Text = "Second item", Description="This is a nice description"},
                 new Item { Id = Guid.NewGuid().ToString(), Text = "Third item", Description="This is a nice description"},
                 new Item { Id = Guid.NewGuid().ToString(), Text = "Fourth item", Description="This is a nice description"},
                 new Item { Id = Guid.NewGuid().ToString(), Text = "Fifth item", Description="This is a nice description"},
-                new Item { Id = Guid.NewGuid().ToString(), Text = "Sixth item", Description="This is a nice description"},
+                new Item { Id = Guid.NewGuid().ToString(), Text = "Sixth item", Description="This is a nice description"},*/
             };
-
-            foreach (Item item in _items)
+            items = new List<Item>();
+			foreach (Item item in _items)
             {
                 items.Add(item);
             }
@@ -60,7 +65,15 @@ namespace demobicentennial
 
         public async Task<IEnumerable<Item>> GetItemsAsync(bool forceRefresh = false)
         {
+			//return await Task.FromResult(items);
+			var json = await client.GetStringAsync($"demobicentennial/?q=mobileapi/node/2.json");
+
+			dynamic stuff = JsonConvert.DeserializeObject(json);
+            var item = new Item();
+            item.Text = stuff.title;
+            items.Add(item);
+
             return await Task.FromResult(items);
-        }
+		}
     }
 }
