@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MapsuiFormsSample", "MapsuiFormsSample\MapsuiFormsSample\MapsuiFormsSample.shproj", "{293FF4BD-5592-4EAC-865B-71B65108B053}"
 EndProject
@@ -186,6 +186,8 @@ Global
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.AppStore|x86.Build.0 = Release|x86
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.AppStore|x86.Deploy.0 = Release|x86
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|Any CPU.Build.0 = Debug|x86
+		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|Any CPU.Deploy.0 = Debug|x86
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|ARM.ActiveCfg = Debug|ARM
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|ARM.Build.0 = Debug|ARM
 		{0C474D1F-65C5-4BCF-82C8-B66F62070584}.Debug|ARM.Deploy.0 = Debug|ARM

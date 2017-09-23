@@ -4,6 +4,7 @@ using Mapsui.Layers;
 using Mapsui.Providers;
 using Mapsui.Styles;
 using Mapsui.Utilities;
+using Mapsui.Projection;
 
 namespace MapsuiFormsSample
 {
@@ -20,7 +21,16 @@ namespace MapsuiFormsSample
 	        mapControl.NativeMap.Layers.Add(layer);
 	        mapControl.NativeMap.InfoLayers.Add(layer);
 
-	        mapControl.NativeMap.Info += (sender, args) =>
+            // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
+            var centerOfLondonOntario = new Point(-81.2497, 42.9837);
+            // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
+            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(centerOfLondonOntario.X, centerOfLondonOntario.Y);
+            // Set the center of the viewport to the coordinate. The UI will refresh automatically
+            mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
+            // Additionally you might want to set the resolution, this could depend on your specific purpose
+            mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[9]);
+
+            mapControl.NativeMap.Info += (sender, args) =>
 	            {
 	                var layername = args.Layer?.Name;
 	                var featureLabel = args.Feature?["Label"]?.ToString();
