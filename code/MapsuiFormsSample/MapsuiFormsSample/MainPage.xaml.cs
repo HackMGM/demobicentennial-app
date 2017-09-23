@@ -45,11 +45,12 @@ namespace MapsuiFormsSample
 	            {
 	                Name = layername,
 	                DataSource = new MemoryProvider(GetIconFeatures()),
+                    // Triangle near hamburg.
                     Style = new SymbolStyle
 	                    {
 	                        SymbolScale = 0.8,
-	                        Fill = new Brush(Color.Red),
-	                        Outline = { Color = Color.Black, Width = 1 }
+	                        Fill = new Brush(Color.Blue),
+	                        Outline = { Color = Color.Red, Width = 1 }
 	                    }
                 };
 	    }
@@ -59,6 +60,7 @@ namespace MapsuiFormsSample
 	        var features = new Features();
 	        var feature = new Feature
 	            {
+
 	                Geometry = new Polygon(new LinearRing(new[]
 	                    {
 	                        new Point(1066689.6851, 6892508.8652),
