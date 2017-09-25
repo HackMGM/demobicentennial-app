@@ -12,7 +12,7 @@ namespace MapsuiFormsSample
 {
     public partial class MapPage
     {
-        public MapPage()
+        public MapPage(double longitude, double lat)
         {
             InitializeComponent();
 
@@ -26,7 +26,7 @@ namespace MapsuiFormsSample
             // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
             // Format (Long, Lat)
             // Zoom to http://matrixrevolutions.ddns.net:8080/demobicentennial/mobileapi/node/2
-            var currentMarker = new Mapsui.Geometries.Point(-86.300783, 32.37685);
+            var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
             // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
             var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
@@ -54,12 +54,7 @@ namespace MapsuiFormsSample
           
 
         }
-
-        async void OnButtonClicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new MapPage());
-        }
-
+        
         private ILayer GenerateIconLayer()
         {
             var layername = "My Local Layer";
