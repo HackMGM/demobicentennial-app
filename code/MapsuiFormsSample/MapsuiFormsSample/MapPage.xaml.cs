@@ -24,13 +24,15 @@ namespace MapsuiFormsSample
             mapControl.NativeMap.InfoLayers.Add(layer);
 
             // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
-            var centerOfLondonOntario = new Mapsui.Geometries.Point(-81.2497, 42.9837);
+            // Format (Long, Lat)
+            // Zoom to http://matrixrevolutions.ddns.net:8080/demobicentennial/mobileapi/node/2
+            var currentMarker = new Mapsui.Geometries.Point(-86.300783, 32.37685);
             // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
-            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(centerOfLondonOntario.X, centerOfLondonOntario.Y);
+            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
             // Additionally you might want to set the resolution, this could depend on your specific purpose
-            mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[9]);
+            mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[18]);
 
             mapControl.NativeMap.Info += (sender, args) =>
             {
