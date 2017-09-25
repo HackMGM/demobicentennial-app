@@ -1,89 +1,39 @@
-﻿using System.Diagnostics;
-using Mapsui.Geometries;
-using Mapsui.Layers;
-using Mapsui.Providers;
-using Mapsui.Styles;
-using Mapsui.Utilities;
-using Mapsui.Projection;
+﻿using System;
+using Xamarin.Forms;
 
 namespace MapsuiFormsSample
 {
-	public partial class MainPage
+    public partial class MainPage
 	{
 		public MainPage()
 		{
 			InitializeComponent();
+            
+            // TODO: Create new label
 
-	        var mapControl = new MapsUIView();
-	        mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
+            Label testLabel = new Label
+            {
+                Text = "Test Label",
+                HorizontalOptions = LayoutOptions.Center
+            };
+            Button button = new Button
+            {
+                Text = "Click Me!",
+                BorderWidth = 1,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.CenterAndExpand
+            };
+            button.Clicked += OnButtonClicked;
+            ContentGrid.Children.Add(testLabel);
+            ContentGrid.Children.Add(button);
 
-	        var layer = GenerateIconLayer();
-	        mapControl.NativeMap.Layers.Add(layer);
-	        mapControl.NativeMap.InfoLayers.Add(layer);
+        }
 
-            // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
-            var centerOfLondonOntario = new Point(-81.2497, 42.9837);
-            // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
-            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(centerOfLondonOntario.X, centerOfLondonOntario.Y);
-            // Set the center of the viewport to the coordinate. The UI will refresh automatically
-            mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
-            // Additionally you might want to set the resolution, this could depend on your specific purpose
-            mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[9]);
+        async void OnButtonClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new MapPage());
+        }
 
-            mapControl.NativeMap.Info += (sender, args) =>
-	            {
-	                var layername = args.Layer?.Name;
-	                var featureLabel = args.Feature?["Label"]?.ToString();
-	                var featureType = args.Feature?["Type"]?.ToString();
-
-	                Debug.WriteLine("Info Event was invoked.");
-	                Debug.WriteLine("Layername: " + layername);
-	                Debug.WriteLine("Feature Label: " + featureLabel);
-	                Debug.WriteLine("Feature Type: " + featureType);
-
-	                Debug.WriteLine("World Postion: {0:F4} , {1:F4}", args.WorldPosition?.X, args.WorldPosition?.Y);
-	                Debug.WriteLine("Screen Postion: {0:F4} , {1:F4}", args.ScreenPosition?.X, args.ScreenPosition?.Y);
-	            };
-
-	        ContentGrid.Children.Add(mapControl);
-	    }
-
-	    private ILayer GenerateIconLayer()
-	    {
-	        var layername = "My Local Layer";
-	        return new Layer(layername)
-	            {
-	                Name = layername,
-	                DataSource = new MemoryProvider(GetIconFeatures()),
-                    // Triangle near hamburg.
-                    Style = new SymbolStyle
-	                    {
-	                        SymbolScale = 0.8,
-	                        Fill = new Brush(Color.Blue),
-	                        Outline = { Color = Color.Red, Width = 1 }
-	                    }
-                };
-	    }
-
-	    private Features GetIconFeatures()
-	    {
-	        var features = new Features();
-	        var feature = new Feature
-	            {
-
-	                Geometry = new Polygon(new LinearRing(new[]
-	                    {
-	                        new Point(1066689.6851, 6892508.8652),
-	                        new Point(1005540.0624, 6987290.7802),
-	                        new Point(1107659.9322, 7056389.8538),
-	                        new Point(1066689.6851, 6892508.8652)
-	                    })),
-	                ["Label"] = "My Feature Label",
-	                ["Type"] = "My Feature Type"
-	            };
-
-	        features.Add(feature);
-	        return features;
-	    }
+	    
     }
 }

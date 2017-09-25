@@ -1,12 +1,14 @@
-﻿namespace MapsuiFormsSample
+﻿using Xamarin.Forms;
+
+namespace MapsuiFormsSample
 {
-	public partial class App
+    public partial class App
 	{
 		public App ()
 		{
 			InitializeComponent();
 
-			MainPage = new MainPage();
+			MainPage = new NavigationPage(new MainPage());
 		}
 
 		protected override void OnStart ()
