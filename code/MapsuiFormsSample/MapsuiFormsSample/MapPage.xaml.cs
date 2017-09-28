@@ -5,15 +5,14 @@ using Mapsui.Providers;
 using Mapsui.Styles;
 using Mapsui.Utilities;
 using Mapsui.Projection;
-using Xamarin.Forms;
-using System;
 
 namespace MapsuiFormsSample
 {
     public partial class MapPage
     {
-        public MapPage(double longitude, double lat)
+        public MapPage(string title, double longitude, double lat)
         {
+            this.Title = title;
             InitializeComponent();
 
             var mapControl = new MapsUIView();
