@@ -138,8 +138,8 @@ namespace MapsuiFormsSample
             }
             catch (JsonReaderException e)
             {
-                Console.WriteLine("Exception: " + e.Message);
-                Console.WriteLine("Stack trace: " + e.StackTrace);
+                // Console.WriteLine("Exception: " + e.Message);
+                //Console.WriteLine("Stack trace: " + e.StackTrace);
                 await DisplayAlert("Alert", "Data for this marker is invalid: " + e.Message, "OK");
 
 
