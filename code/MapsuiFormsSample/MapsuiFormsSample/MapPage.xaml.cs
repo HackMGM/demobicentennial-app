@@ -18,17 +18,19 @@ namespace MapsuiFormsSample
             var mapControl = new MapsUIView();
             mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
 
-            var layer = GenerateIconLayer();
-            mapControl.NativeMap.Layers.Add(layer);
-            mapControl.NativeMap.Layers.Add(CreateLayer(longitude, lat));
-            mapControl.NativeMap.InfoLayers.Add(layer);
-
             // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
             // Format (Long, Lat)
             // Zoom to marker location
             var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
             // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
             var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
+
+            var layer = GenerateIconLayer();
+            mapControl.NativeMap.Layers.Add(layer);
+            mapControl.NativeMap.Layers.Add(CreateLayer(sphericalMercatorCoordinate));
+            mapControl.NativeMap.InfoLayers.Add(layer);
+
+       
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
             // Additionally you might want to set the resolution, this could depend on your specific purpose
@@ -55,11 +57,11 @@ namespace MapsuiFormsSample
 
         }
 
-        public static ILayer CreateLayer(double longitude, double lat)
+        public static ILayer CreateLayer(Point point)
         {
             var memoryProvider = new MemoryProvider();
 
-            var featureWithDefaultStyle = new Feature { Geometry = new Point(0, 0) };
+            var featureWithDefaultStyle = new Feature { Geometry = point };
             featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = "Default Label" });
             memoryProvider.Features.Add(featureWithDefaultStyle);
 
