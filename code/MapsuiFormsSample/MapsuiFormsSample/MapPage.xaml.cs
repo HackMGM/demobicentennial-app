@@ -24,7 +24,7 @@ namespace MapsuiFormsSample
 
             // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
             // Format (Long, Lat)
-            // Zoom to http://matrixrevolutions.ddns.net:8080/demobicentennial/mobileapi/node/2
+            // Zoom to marker location
             var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
             // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
             var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);

@@ -17,7 +17,7 @@ namespace MapsuiFormsSample
             // Required line when using XAML file.
             InitializeComponent();
             client = new HttpClient();
-            client.BaseAddress = new Uri($"http://matrixrevolutions.ddns.net:8080/");
+            client.BaseAddress = new Uri($"http://13.82.106.207/");
             ShowTestButton();
             ShowMarkersList();
         }
@@ -44,7 +44,7 @@ namespace MapsuiFormsSample
         async void ShowMarkersList()
         {
 
-            var json = await client.GetStringAsync($"demobicentennial/?q=mobileapi/node.json");
+            var json = await client.GetStringAsync($"/?q=mobileapi/node.json");
             dynamic markers = JsonConvert.DeserializeObject(json);
             List<Marker> markersList = new List<Marker>();
             foreach (dynamic marker in markers)
@@ -108,7 +108,7 @@ namespace MapsuiFormsSample
                 {
                     return;
                 }
-                ShowMarkerLocation(marker.Title, "demobicentennial/?q=mobileapi/node/" + marker.NodeId);
+                ShowMarkerLocation(marker.Title, "/?q=mobileapi/node/" + marker.NodeId);
                 listView.SelectedItem = null;
             };
 
@@ -119,7 +119,7 @@ namespace MapsuiFormsSample
         async void OnButtonClicked(object sender, EventArgs e)
         {
             // TODO: load the specific item clicked.
-            ShowMarkerLocation("Test hardcoded marker", "demobicentennial/?q=mobileapi/node/2.json");
+            ShowMarkerLocation("Test hardcoded marker", "/?q=mobileapi/node/2.json");
         }
 
         async void ShowMarkerLocation(string title, string url)
