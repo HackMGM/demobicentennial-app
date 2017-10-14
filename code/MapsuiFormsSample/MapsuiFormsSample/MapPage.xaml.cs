@@ -25,11 +25,7 @@ namespace MapsuiFormsSample
             // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
             var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
 
-            var layer = GenerateIconLayer();
-            mapControl.NativeMap.Layers.Add(layer);
-            mapControl.NativeMap.Layers.Add(CreateLayer(sphericalMercatorCoordinate));
-            mapControl.NativeMap.InfoLayers.Add(layer);
-
+            mapControl.NativeMap.Layers.Add(CreateLayer(title, sphericalMercatorCoordinate));
        
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
@@ -57,38 +53,14 @@ namespace MapsuiFormsSample
 
         }
 
-        public static ILayer CreateLayer(Point point)
+        public static ILayer CreateLayer(string label, Point point)
         {
             var memoryProvider = new MemoryProvider();
 
             var featureWithDefaultStyle = new Feature { Geometry = point };
-            featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = "Default Label" });
+            featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = label });
             memoryProvider.Features.Add(featureWithDefaultStyle);
-
-
-            var featureWithRightAlignedStyle = new Feature { Geometry = new Point(0, -2000000) };
-            featureWithRightAlignedStyle.Styles.Add(new LabelStyle
-            {
-                Text = "Right Aligned",
-                BackColor = new Brush(Color.Gray),
-                HorizontalAlignment = LabelStyle.HorizontalAlignmentEnum.Right
-            });
-            memoryProvider.Features.Add(featureWithRightAlignedStyle);
-
-
-            var featureWithBottomAlignedStyle = new Feature { Geometry = new Point(0, -4000000) };
-            featureWithBottomAlignedStyle.Styles.Add(new LabelStyle
-            {
-                Text = "Right Aligned",
-                BackColor = new Brush(Color.Gray),
-                VerticalAlignment = LabelStyle.VerticalAlignmentEnum.Bottom
-            });
-            memoryProvider.Features.Add(featureWithBottomAlignedStyle);
-
-
-            var featureWithColors = new Feature { Geometry = new Point(0, -6000000) };
-            featureWithColors.Styles.Add(CreateColoredLabelStyle());
-            memoryProvider.Features.Add(featureWithColors);
+            
 
             return new MemoryLayer { Name = "Points with labels", DataSource = memoryProvider };
         }
@@ -105,42 +77,6 @@ namespace MapsuiFormsSample
         }
 
 
-        private ILayer GenerateIconLayer()
-        {
-            var layername = "My Local Layer";
-            return new Layer(layername)
-            {
-                Name = layername,
-                DataSource = new MemoryProvider(GetIconFeatures()),
-                // Triangle near hamburg.
-                Style = new SymbolStyle
-                {
-                    SymbolScale = 0.8,
-                    Fill = new Brush(Mapsui.Styles.Color.Blue),
-                    Outline = { Color = Mapsui.Styles.Color.Red, Width = 1 }
-                }
-            };
-        }
-
-        private Features GetIconFeatures()
-        {
-            var features = new Features();
-            var feature = new Feature
-            {
-
-                Geometry = new Polygon(new LinearRing(new[]
-                        {
-                            new Mapsui.Geometries.Point(1066689.6851, 6892508.8652),
-                            new Mapsui.Geometries.Point(1005540.0624, 6987290.7802),
-                            new Mapsui.Geometries.Point(1107659.9322, 7056389.8538),
-                            new Mapsui.Geometries.Point(1066689.6851, 6892508.8652)
-                        })),
-                ["Label"] = "My Feature Label",
-                ["Type"] = "My Feature Type"
-            };
-
-            features.Add(feature);
-            return features;
-        }
+       
     }
 }
