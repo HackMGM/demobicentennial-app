@@ -16,6 +16,7 @@ namespace MapsuiFormsSample
 {
     public partial class MapPage
     {
+        private MapsUIView _mapControl = null;
         private List<Marker> _markersList = new List<Marker>();
 
         public MapPage()
@@ -23,17 +24,17 @@ namespace MapsuiFormsSample
             this.Title = "Map";
             InitializeComponent();
 
-            var mapControl = new MapsUIView();
-            mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
+            _mapControl = new MapsUIView();
+            _mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
 
-            mapControl.NativeMap.Layers.Add(CreateLayer());
+            _mapControl.NativeMap.Layers.Add(CreateLayer());
 
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             // mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
             // Additionally you might want to set the resolution, this could depend on your specific purpose
             // mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[18]);
 
-            mapControl.NativeMap.Info += (sender, args) =>
+            _mapControl.NativeMap.Info += (sender, args) =>
             {
                 var layername = args.Layer?.Name;
                 var featureLabel = args.Feature?["Label"]?.ToString();
@@ -49,25 +50,35 @@ namespace MapsuiFormsSample
                 ShowNearestMarker(args.WorldPosition);
             };
 
-            ContentGrid.Children.Add(mapControl);
+            ContentGrid.Children.Add(_mapControl);
         }
 
 
-        private void ShowNearestMarker(Point worldPosition)
+        private async void ShowNearestMarker(Point worldPosition)
         {
-            Tuple<double, Marker> closestMarkerDist = new Tuple<double, Marker>(Double.MaxValue, new Marker("", "", new Point(), ""));
-            foreach (Marker marker in _markersList)
+            Debug.WriteLine("Viewport.Resolution: " + _mapControl.NativeMap.Viewport.Resolution);
+
+            // Wait until zoomed into a certain amount.
+            if (_mapControl.NativeMap.Viewport.Resolution < 10)
             {
-                double distance = worldPosition.Distance(marker.LocationSphericalMercator);
-                if (distance < closestMarkerDist.Item1)
+                Tuple<double, Marker> closestMarkerDist = new Tuple<double, Marker>(Double.MaxValue, new Marker("", "", new Point(), ""));
+                foreach (Marker marker in _markersList)
                 {
-                    closestMarkerDist = new Tuple<double, Marker>(distance, marker);
+                    double distance = worldPosition.Distance(marker.LocationSphericalMercator);
+                    if (distance < closestMarkerDist.Item1)
+                    {
+                        closestMarkerDist = new Tuple<double, Marker>(distance, marker);
+                    }
+                }
+                Debug.WriteLine("Closest Marker:");
+                Debug.WriteLine("distance: " + closestMarkerDist.Item1);
+                Debug.WriteLine("Title: " + closestMarkerDist.Item2.Title);
+
+                if (closestMarkerDist.Item1 < 150)
+                {
+                    await Navigation.PushAsync(new MarkerInfoPage(closestMarkerDist.Item2));
                 }
             }
-            Debug.WriteLine("Closest Marker:");
-            Debug.WriteLine("distance: " + closestMarkerDist.Item1);
-            Debug.WriteLine("Title: " + closestMarkerDist.Item2.Title);
-
         }
 
         public ILayer CreateLayer()
