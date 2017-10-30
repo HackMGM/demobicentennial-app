@@ -38,3 +38,5 @@ Thumbs.db
 
 # dotCover
 *.dotCover
+code/MapsuiFormsSample/MapsuiFormsSample.UWP/MapsuiFormsSample.UWP.nuget.props
+code/MapsuiFormsSample/MapsuiFormsSample.UWP/project.lock.json

@@ -5,35 +5,36 @@ using Mapsui.Providers;
 using Mapsui.Styles;
 using Mapsui.Utilities;
 using Mapsui.Projection;
+using MapsuiFormsSample.TestData;
+using MapsuiFormsSample.DataObjects;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Microsoft.CSharp.RuntimeBinder;
+using System;
 
 namespace MapsuiFormsSample
 {
     public partial class MapPage
     {
-        public MapPage(string title, double longitude, double lat)
+        private MapsUIView _mapControl = null;
+        private List<Marker> _markersList = new List<Marker>();
+
+        public MapPage()
         {
-            this.Title = title;
+            this.Title = "Map";
             InitializeComponent();
 
-            var mapControl = new MapsUIView();
-            mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
+            _mapControl = new MapsUIView();
+            _mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
 
-            var layer = GenerateIconLayer();
-            mapControl.NativeMap.Layers.Add(layer);
-            mapControl.NativeMap.InfoLayers.Add(layer);
+            _mapControl.NativeMap.Layers.Add(CreateLayer());
 
-            // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
-            // Format (Long, Lat)
-            // Zoom to marker location
-            var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
-            // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
-            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
-            mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
+            // mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
             // Additionally you might want to set the resolution, this could depend on your specific purpose
-            mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[18]);
+            // mapControl.NativeMap.NavigateTo(mapControl.NativeMap.Resolutions[18]);
 
-            mapControl.NativeMap.Info += (sender, args) =>
+            _mapControl.NativeMap.Info += (sender, args) =>
             {
                 var layername = args.Layer?.Name;
                 var featureLabel = args.Feature?["Label"]?.ToString();
@@ -46,50 +47,102 @@ namespace MapsuiFormsSample
 
                 Debug.WriteLine("World Postion: {0:F4} , {1:F4}", args.WorldPosition?.X, args.WorldPosition?.Y);
                 Debug.WriteLine("Screen Postion: {0:F4} , {1:F4}", args.ScreenPosition?.X, args.ScreenPosition?.Y);
+                ShowNearestMarker(args.WorldPosition);
             };
 
-            ContentGrid.Children.Add(mapControl);
-
-          
-
+            ContentGrid.Children.Add(_mapControl);
         }
-        
-        private ILayer GenerateIconLayer()
+
+
+        private async void ShowNearestMarker(Point worldPosition)
         {
-            var layername = "My Local Layer";
-            return new Layer(layername)
+            Debug.WriteLine("Viewport.Resolution: " + _mapControl.NativeMap.Viewport.Resolution);
+
+            // Wait until zoomed into a certain amount.
+            if (_mapControl.NativeMap.Viewport.Resolution < 10)
             {
-                Name = layername,
-                DataSource = new MemoryProvider(GetIconFeatures()),
-                // Triangle near hamburg.
-                Style = new SymbolStyle
+                Tuple<double, Marker> closestMarkerDist = new Tuple<double, Marker>(Double.MaxValue, new Marker("", "", new Point(), ""));
+                foreach (Marker marker in _markersList)
                 {
-                    SymbolScale = 0.8,
-                    Fill = new Brush(Mapsui.Styles.Color.Blue),
-                    Outline = { Color = Mapsui.Styles.Color.Red, Width = 1 }
+                    double distance = worldPosition.Distance(marker.LocationSphericalMercator);
+                    if (distance < closestMarkerDist.Item1)
+                    {
+                        closestMarkerDist = new Tuple<double, Marker>(distance, marker);
+                    }
                 }
-            };
+                Debug.WriteLine("Closest Marker:");
+                Debug.WriteLine("distance: " + closestMarkerDist.Item1);
+                Debug.WriteLine("Title: " + closestMarkerDist.Item2.Title);
+
+                if (closestMarkerDist.Item1 < 150)
+                {
+                    await Navigation.PushAsync(new MarkerInfoPage(closestMarkerDist.Item2));
+                }
+            }
         }
 
-        private Features GetIconFeatures()
+        public ILayer CreateLayer()
         {
-            var features = new Features();
-            var feature = new Feature
+            var memoryProvider = new MemoryProvider();
+
+            string markersJson = TestMarkerData.JsonTestData;
+
+            dynamic markers = JsonConvert.DeserializeObject(markersJson);
+            foreach (dynamic marker in markers)
             {
+                if ("historic_marker".Equals(marker.type.ToString()))
+                {
+                    string label = marker.title.ToString();
 
-                Geometry = new Polygon(new LinearRing(new[]
-                        {
-                            new Mapsui.Geometries.Point(1066689.6851, 6892508.8652),
-                            new Mapsui.Geometries.Point(1005540.0624, 6987290.7802),
-                            new Mapsui.Geometries.Point(1107659.9322, 7056389.8538),
-                            new Mapsui.Geometries.Point(1066689.6851, 6892508.8652)
-                        })),
-                ["Label"] = "My Feature Label",
-                ["Type"] = "My Feature Type"
+                    try
+                    {
+                        double lat = marker.field_coordinates.und[0].safe_value;
+                        double longitude = marker.field_coordinates.und[1].safe_value;
+                        // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
+                        // Format (Long, Lat)
+                        // Zoom to marker location
+                        var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
+                        // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
+                        Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
+                        string description = marker.field_description.und[0].safe_value.ToString();
+                        _markersList.Add(new Marker(label, marker.nid.ToString(), sphericalMercatorCoordinate, description));
+
+
+                        // Here is where we could loop through and add all the markers to the map as "Features"
+                        var featureWithDefaultStyle = new Feature { Geometry = sphericalMercatorCoordinate };
+                        featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = label });
+                        memoryProvider.Features.Add(featureWithDefaultStyle);
+                    }
+                    catch (RuntimeBinderException)
+                    {
+                        Debug.WriteLine("No valid GPS coordinates found for this marker:" + label);
+                    }
+                    catch (JsonReaderException e)
+                    {
+                        // Console.WriteLine("Exception: " + e.Message);
+                        //Console.WriteLine("Stack trace: " + e.StackTrace);
+                        Debug.WriteLine("Data for " + label + " marker is invalid: " + e.Message);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label);
+                    }
+
+                }
+            }
+
+            return new MemoryLayer { Name = "Points with labels", DataSource = memoryProvider };
+        }
+
+        private static IStyle CreateColoredLabelStyle()
+        {
+            return new LabelStyle
+            {
+                Text = "Colors",
+                BackColor = new Brush(Color.Blue),
+                ForeColor = Color.White,
+                Halo = new Pen(Color.Red, 4)
             };
-
-            features.Add(feature);
-            return features;
         }
     }
 }

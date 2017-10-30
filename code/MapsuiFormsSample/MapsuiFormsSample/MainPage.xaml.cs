@@ -11,7 +11,7 @@ namespace MapsuiFormsSample
     public partial class MainPage
     {
         HttpClient client = null;
-
+        /*
         public MainPage()
         {
             // Required line when using XAML file.
@@ -138,8 +138,8 @@ namespace MapsuiFormsSample
             }
             catch (JsonReaderException e)
             {
-                Console.WriteLine("Exception: " + e.Message);
-                Console.WriteLine("Stack trace: " + e.StackTrace);
+                // Console.WriteLine("Exception: " + e.Message);
+                //Console.WriteLine("Stack trace: " + e.StackTrace);
                 await DisplayAlert("Alert", "Data for this marker is invalid: " + e.Message, "OK");
 
 
@@ -149,7 +149,7 @@ namespace MapsuiFormsSample
                 await DisplayAlert("Alert", "GPS coordinates are in invalid format for this marker", "OK");
             }
         }
-
+        */
 
     }
 }

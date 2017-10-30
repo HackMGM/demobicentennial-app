@@ -25248,14 +25248,14 @@
     "UAP,Version=v10.0": []
   },
   "packageFolders": {
-    "C:\\Users\\sebas\\.nuget\\packages\\": {}
+    "C:\\Users\\elijahlofgren\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "G:\\Downloads\\MapsuiFormsSample\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\MapsuiFormsSample.UWP.csproj",
+      "projectUniqueName": "C:\\demobicentennial-app\\code\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\MapsuiFormsSample.UWP.csproj",
       "projectName": "MapsuiFormsSample.UWP",
-      "projectPath": "G:\\Downloads\\MapsuiFormsSample\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\MapsuiFormsSample.UWP.csproj",
-      "projectJsonPath": "G:\\Downloads\\MapsuiFormsSample\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\project.json",
+      "projectPath": "C:\\demobicentennial-app\\code\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\MapsuiFormsSample.UWP.csproj",
+      "projectJsonPath": "C:\\demobicentennial-app\\code\\MapsuiFormsSample\\MapsuiFormsSample.UWP\\project.json",
       "projectStyle": "ProjectJson"
     },
     "dependencies": {
