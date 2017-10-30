@@ -130,7 +130,7 @@ namespace MapsuiFormsSample
                 dynamic stuff = JsonConvert.DeserializeObject(json);
                 double lat = stuff.field_coordinates.und[0].safe_value;
                 double longitude = stuff.field_coordinates.und[1].safe_value;
-                await Navigation.PushAsync(new MapPage(title, longitude, lat));
+                //await Navigation.PushAsync(new MapPage(title, longitude, lat));
             }
             catch (RuntimeBinderException)
             {
