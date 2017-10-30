@@ -46,11 +46,27 @@ namespace MapsuiFormsSample
 
                 Debug.WriteLine("World Postion: {0:F4} , {1:F4}", args.WorldPosition?.X, args.WorldPosition?.Y);
                 Debug.WriteLine("Screen Postion: {0:F4} , {1:F4}", args.ScreenPosition?.X, args.ScreenPosition?.Y);
+                ShowNearestMarker(args.WorldPosition);
             };
 
             ContentGrid.Children.Add(mapControl);
+        }
 
 
+        private void ShowNearestMarker(Point worldPosition)
+        {
+            Tuple<double, Marker> closestMarkerDist = new Tuple<double, Marker>(Double.MaxValue, new Marker("", "", new Point(), ""));
+            foreach (Marker marker in _markersList)
+            {
+                double distance = worldPosition.Distance(marker.LocationSphericalMercator);
+                if (distance < closestMarkerDist.Item1)
+                {
+                    closestMarkerDist = new Tuple<double, Marker>(distance, marker);
+                }
+            }
+            Debug.WriteLine("Closest Marker:");
+            Debug.WriteLine("distance: " + closestMarkerDist.Item1);
+            Debug.WriteLine("Title: " + closestMarkerDist.Item2.Title);
 
         }
 
@@ -66,7 +82,6 @@ namespace MapsuiFormsSample
                 if ("historic_marker".Equals(marker.type.ToString()))
                 {
                     string label = marker.title.ToString();
-                    _markersList.Add(new Marker(label, marker.nid.ToString()));
 
                     try
                     {
@@ -77,7 +92,9 @@ namespace MapsuiFormsSample
                         // Zoom to marker location
                         var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
                         // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
-                        var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
+                        Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
+                        string description = marker.field_description.und[0].safe_value.ToString();
+                        _markersList.Add(new Marker(label, marker.nid.ToString(), sphericalMercatorCoordinate, description));
 
 
                         // Here is where we could loop through and add all the markers to the map as "Features"
@@ -116,8 +133,5 @@ namespace MapsuiFormsSample
                 Halo = new Pen(Color.Red, 4)
             };
         }
-
-
-
     }
 }

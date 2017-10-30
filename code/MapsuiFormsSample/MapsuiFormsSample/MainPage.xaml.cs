@@ -11,7 +11,7 @@ namespace MapsuiFormsSample
     public partial class MainPage
     {
         HttpClient client = null;
-
+        /*
         public MainPage()
         {
             // Required line when using XAML file.
@@ -130,7 +130,7 @@ namespace MapsuiFormsSample
                 dynamic stuff = JsonConvert.DeserializeObject(json);
                 double lat = stuff.field_coordinates.und[0].safe_value;
                 double longitude = stuff.field_coordinates.und[1].safe_value;
-                //await Navigation.PushAsync(new MapPage(title, longitude, lat));
+                await Navigation.PushAsync(new MapPage(title, longitude, lat));
             }
             catch (RuntimeBinderException)
             {
@@ -149,7 +149,7 @@ namespace MapsuiFormsSample
                 await DisplayAlert("Alert", "GPS coordinates are in invalid format for this marker", "OK");
             }
         }
-
+        */
 
     }
 }
