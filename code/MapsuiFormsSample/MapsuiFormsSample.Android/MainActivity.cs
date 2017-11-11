@@ -2,6 +2,8 @@
 using Android.Content.PM;
 using Android.OS;
 using Xamarin.Forms.Platform.Android;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 
 namespace MapsuiFormsSample.Droid
 {
@@ -18,6 +20,11 @@ namespace MapsuiFormsSample.Droid
 			Xamarin.Forms.Forms.Init (this, bundle);
 			LoadApplication (new App ());
 		}
-	}
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
+        {
+            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }
 
