@@ -28,13 +28,31 @@ namespace MapsuiFormsSample
 
         public MapPage()
         {
+            GenerateMap();
+
+        }
+
+        public async void GenerateMap()
+        {
             this.Title = "Map";
             InitializeComponent();
 
             _mapControl = new MapsUIView();
             _mapControl.NativeMap.Layers.Add(OpenStreetMap.CreateTileLayer());
 
-            _mapControl.NativeMap.Layers.Add(CreateLayer());
+            Position userPosition = null;
+#if __MOBILE__
+            if (IsLocationAvailable())
+            {
+                userPosition = await GetCurrentLocation();
+            }
+            else
+            {
+                RequestLocationPermission();
+            }
+#endif
+
+            _mapControl.NativeMap.Layers.Add(CreateLayer(userPosition));
 
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             // mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
@@ -58,18 +76,8 @@ namespace MapsuiFormsSample
             };
 
             ContentGrid.Children.Add(_mapControl);
-
-            if (IsLocationAvailable())
-            {
-#if __MOBILE__
-                GetCurrentLocation();
-
-            } else
-            {
-                RequestLocationPermission();
-            }
-#endif
         }
+
 #if __MOBILE__
         // Begin adapted from https://github.com/jamesmontemagno/permissionsplugin
         public async void RequestLocationPermission()
@@ -81,7 +89,7 @@ namespace MapsuiFormsSample
                 {
                     if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
                     {
-                        await DisplayAlert("Need location", "Gunna need that location", "OK");
+                        await DisplayAlert("Need location", "Location needed to allow you to play this game", "OK");
                     }
 
                     var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
@@ -144,7 +152,7 @@ namespace MapsuiFormsSample
                 Debug.WriteLine("Error getting user's current location: " + ex);
                 return null;
             }
-            
+
         }
         // End from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
 #endif
@@ -152,10 +160,10 @@ namespace MapsuiFormsSample
         public bool IsLocationAvailable()
         {
 #if __MOBILE__
-                if (!CrossGeolocator.IsSupported)
-                    return false;
+            if (!CrossGeolocator.IsSupported)
+                return false;
 
-                return CrossGeolocator.Current.IsGeolocationAvailable;
+            return CrossGeolocator.Current.IsGeolocationAvailable;
 #else
                 return false;
 #endif
@@ -188,10 +196,10 @@ namespace MapsuiFormsSample
             }
         }
 
-        public ILayer CreateLayer()
+        public ILayer CreateLayer(Position userPosition)
         {
             var memoryProvider = new MemoryProvider();
-
+            ShowUserCurrentLocation(memoryProvider, userPosition);
             string markersJson = TestMarkerData.JsonTestData;
 
             dynamic markers = JsonConvert.DeserializeObject(markersJson);
@@ -238,6 +246,23 @@ namespace MapsuiFormsSample
             }
 
             return new MemoryLayer { Name = "Points with labels", DataSource = memoryProvider };
+        }
+
+
+        private void ShowUserCurrentLocation(MemoryProvider memoryProvider, Position userPosition)
+        {
+            if (userPosition != null)
+            {
+                Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(userPosition.Longitude, userPosition.Latitude);
+                string description = "Your Position";
+                // TODO: Eventually put on another layer.
+                _markersList.Add(new Marker("Your Position", "-1", sphericalMercatorCoordinate, description));
+
+
+                var featureWithDefaultStyle = new Feature { Geometry = sphericalMercatorCoordinate };
+                featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = description });
+                memoryProvider.Features.Add(featureWithDefaultStyle);
+            }
         }
 
         private static IStyle CreateColoredLabelStyle()
