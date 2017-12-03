@@ -172,6 +172,9 @@
       <HintPath>..\..\packages\Xamarin.Forms.2.4.0.38779\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\..\packages\HtmlAgilityPack.1.6.6\lib\netstandard2.0\HtmlAgilityPack.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="..\MapsuiFormsSample\MapsuiFormsSample.projitems" Label="Shared" Condition="Exists('..\MapsuiFormsSample\MapsuiFormsSample.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

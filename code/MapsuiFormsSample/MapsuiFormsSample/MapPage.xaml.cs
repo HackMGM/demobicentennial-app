@@ -14,6 +14,7 @@ using System;
 using System.Threading.Tasks;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
+using MapsuiFormsSample.Services;
 #if __MOBILE__
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
@@ -23,11 +24,13 @@ namespace MapsuiFormsSample
 {
     public partial class MapPage
     {
+        private IMarkerService _markerService;
         private MapsUIView _mapControl = null;
         private List<Marker> _markersList = new List<Marker>();
 
         public MapPage()
         {
+            _markerService = new MarkerService();
             GenerateMap();
 
         }
@@ -52,7 +55,8 @@ namespace MapsuiFormsSample
             }
 #endif
 
-            _mapControl.NativeMap.Layers.Add(CreateLayer(userPosition));
+            ILayer layer = await CreateLayerAsync(userPosition);
+            _mapControl.NativeMap.Layers.Add(layer);
 
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             // mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
@@ -196,53 +200,42 @@ namespace MapsuiFormsSample
             }
         }
 
-        public ILayer CreateLayer(Position userPosition)
+
+        /* Unmerged change from project 'MapsuiFormsSample.UWP'
+        Before:
+                public ILayer CreateLayer(Position userPosition)
+        After:
+                public ILayer CreateLayerAsync(Position userPosition)
+        */
+
+        /* Unmerged change from project 'MapsuiFormsSample.iOS'
+        Before:
+                public ILayer CreateLayer(Position userPosition)
+        After:
+                public ILayer CreateLayerAsync(Position userPosition)
+        */
+
+        /* Unmerged change from project 'MapsuiFormsSample'
+        Before:
+                public ILayer CreateLayer(Position userPosition)
+        After:
+                public ILayer CreateLayerAsync(Position userPosition)
+        */
+        public async Task<ILayer> CreateLayerAsync(Position userPosition)
         {
             var memoryProvider = new MemoryProvider();
             ShowUserCurrentLocation(memoryProvider, userPosition);
-            string markersJson = TestMarkerData.JsonTestData;
-
-            dynamic markers = JsonConvert.DeserializeObject(markersJson);
-            foreach (dynamic marker in markers)
+            //string markersJson = TestMarkerData.JsonTestData;
+            _markersList = await _markerService.GetAllMarkers();
+            foreach (Marker marker in _markersList)
             {
-                if ("historic_marker".Equals(marker.type.ToString()))
-                {
-                    string label = marker.title.ToString();
-
-                    try
-                    {
-                        double lat = marker.field_coordinates.und[0].safe_value;
-                        double longitude = marker.field_coordinates.und[1].safe_value;
-                        // Get the lon lat coordinates from somewhere (Mapsui can not help you there)
-                        // Format (Long, Lat)
-                        // Zoom to marker location
-                        var currentMarker = new Mapsui.Geometries.Point(longitude, lat);
-                        // OSM uses spherical mercator coordinates. So transform the lon lat coordinates to spherical mercator
-                        Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
-                        string description = marker.field_description.und[0].safe_value.ToString();
-                        _markersList.Add(new Marker(label, marker.nid.ToString(), sphericalMercatorCoordinate, description));
+                var featureWithDefaultStyle = new Feature { Geometry = 
+                    marker.LocationSphericalMercator };
+                featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = marker.Title });
+                memoryProvider.Features.Add(featureWithDefaultStyle);
 
 
-                        var featureWithDefaultStyle = new Feature { Geometry = sphericalMercatorCoordinate };
-                        featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = label });
-                        memoryProvider.Features.Add(featureWithDefaultStyle);
-                    }
-                    catch (RuntimeBinderException)
-                    {
-                        Debug.WriteLine("No valid GPS coordinates found for this marker:" + label);
-                    }
-                    catch (JsonReaderException e)
-                    {
-                        // Console.WriteLine("Exception: " + e.Message);
-                        //Console.WriteLine("Stack trace: " + e.StackTrace);
-                        Debug.WriteLine("Data for " + label + " marker is invalid: " + e.Message);
-                    }
-                    catch (InvalidCastException)
-                    {
-                        Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label);
-                    }
 
-                }
             }
 
             return new MemoryLayer { Name = "Points with labels", DataSource = memoryProvider };
