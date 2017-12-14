@@ -63,9 +63,14 @@ namespace MapsuiFormsSample.Services
                                                                                       + " and county: " + _htmlHelper.ExtractText(markerDto.County);
                     markersList.Add(new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description));
                 }
-                catch (InvalidCastException)
+                catch (InvalidCastException e)
                 {
-                    Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label);
+                    Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label + " exception: " + e.ToString());
+                }
+                catch (Exception e)
+                {
+                    // TODO: Show user
+                    Debug.WriteLine("Exception: " + e.ToString());
                 }
 
             }
