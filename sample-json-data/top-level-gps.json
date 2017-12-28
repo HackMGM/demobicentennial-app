@@ -1,0 +1,52 @@
+[{
+		"City" : "<a href=\"/?q=taxonomy/term/68\">Montgomery</a>",
+		"Coordinates" : ["32.37685", "-86.30078333"],
+		"County" : "<a href=\"/?q=taxonomy/term/51\">Montgomery</a>",
+		"title" : "<a href=\"/?q=node/2\">Alabama Highway Patrol</a>"
+	}, {
+		"City" : "<a href=\"/?q=taxonomy/term/68\">Montgomery</a>",
+		"Coordinates" : ["N 32\u00b0 22.562", "W 086\u00b0 20.908"],
+		"County" : "<a href=\"/?q=taxonomy/term/51\">Montgomery</a>",
+		"title" : "<a href=\"/?q=content/bird-dog\">Bird-Dog</a>"
+	}, {
+		"City" : "<a href=\"/?q=taxonomy/term/79\">Birmingham</a>",
+		"Coordinates" : [],
+		"County" : "<a href=\"/?q=taxonomy/term/37\">Jefferson</a>",
+		"title" : "<a href=\"/?q=node/8\">Malfunction Junction</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/headland\">Headland</a>",
+		"Coordinates" : ["31.35148333", "-85.33825"],
+		"County" : "<a href=\"/?q=taxonomy/term/34\">Henry</a>",
+		"title" : "<a href=\"/?q=content/first-baptist-church-headland\">First Baptist Church of Headland</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/screamer-community\">Screamer Community</a>",
+		"Coordinates" : ["31.68158333", "-85.2021"],
+		"County" : "<a href=\"/?q=taxonomy/term/34\">Henry</a>",
+		"title" : "<a href=\"/?q=content/liberty-united-methodist-church-hilliardsville\">Liberty United Methodist Church / Hilliardsville</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/fort-mitchell\">Fort Mitchell</a>",
+		"Coordinates" : ["32.3441", "-85.021"],
+		"County" : "<a href=\"/?q=taxonomy/term/57\">Russell</a>",
+		"title" : "<a href=\"/?q=content/indian-ball-ground\">Indian Ball Ground</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/holy-trinity\">Holy Trinity</a>",
+		"Coordinates" : ["32.22061666", "-85.00588333"],
+		"County" : "<a href=\"/?q=taxonomy/term/57\">Russell</a>",
+		"title" : "<a href=\"/?q=content/spanish-fort\">Spanish Fort</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/highland-home\">Highland Home</a>",
+		"Coordinates" : ["31.95226666", "-86.3137"],
+		"County" : "<a href=\"/?q=taxonomy/term/21\">Crenshaw</a>",
+		"title" : "<a href=\"/?q=content/site-highland-home-college\">Site of Highland Home College</a>"
+	}, {
+		"City" : "<a href=\"/?q=city/vestavia\">Vestavia</a>",
+		"Coordinates" : ["33.45123333", "-86.71606666"],
+		"County" : "<a href=\"/?q=taxonomy/term/36\">Jackson</a>",
+		"title" : "<a href=\"/?q=content/anthony-l-barnesthe-cahaba-pumping-station\">Anthony L. Barnes/The Cahaba Pumping Station</a>"
+	}, {
+		"City" : "<a href=\"/?q=taxonomy/term/79\">Birmingham</a>",
+		"Coordinates" : ["33.5704", "-86.7248"],
+		"County" : "<a href=\"/?q=taxonomy/term/37\">Jefferson</a>",
+		"title" : "<a href=\"/?q=content/east-lake-park\">East Lake Park</a>"
+	}
+]
