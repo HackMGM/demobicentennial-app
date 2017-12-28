@@ -10,9 +10,12 @@ namespace MapsuiFormsSample.Services
 {
     public class LocationService : ILocationService
     {
+        ILocationServiceChangeWatcher _watcher;
+
         // Begin adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/LocationChanges.html
-        public async Task StartListening()
+        public async Task StartListening(ILocationServiceChangeWatcher watcher)
         {
+            _watcher = watcher;
             Debug.WriteLine("LocationService.StartListening() called.");
 
             if (CrossGeolocator.Current.IsListening)
@@ -27,13 +30,16 @@ namespace MapsuiFormsSample.Services
                 Debug.WriteLine("LocationService.IsListening is false. Starting listening...");
 
             }
+            int minTimeInSeconds = 5;
+            int minDistince = 1; // TBD: Units. Probably change to 10 instead of 1.
+            bool includeHeading = true; // TODO: perhaps draw heading on map so user knows which direction they are facing
+            await CrossGeolocator.Current.StartListeningAsync(TimeSpan.FromSeconds(minTimeInSeconds), minDistince, includeHeading);
 
-            await CrossGeolocator.Current.StartListeningAsync(TimeSpan.FromSeconds(5), 1, true);
-
-            CrossGeolocator.Current.PositionChanged += PositionChanged;
+            CrossGeolocator.Current.PositionChanged += _watcher.PositionChanged;
             CrossGeolocator.Current.PositionError += PositionError;
         }
 
+        /*
         private void PositionChanged(object sender, PositionEventArgs e)
         {
 
@@ -48,6 +54,7 @@ namespace MapsuiFormsSample.Services
             output += "\n" + $"Altitude Accuracy: {position.AltitudeAccuracy}";
             Debug.WriteLine(output);
         }
+        */
 
         private void PositionError(object sender, PositionErrorEventArgs e)
         {
@@ -63,7 +70,7 @@ namespace MapsuiFormsSample.Services
 
             await CrossGeolocator.Current.StopListeningAsync();
 
-            CrossGeolocator.Current.PositionChanged -= PositionChanged;
+            CrossGeolocator.Current.PositionChanged -= _watcher.PositionChanged;
             CrossGeolocator.Current.PositionError -= PositionError;
         }
 

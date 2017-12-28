@@ -26,6 +26,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Services\ILocationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ILocationServiceChangeWatcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LocationService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestData\TestMarkerData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\MarkerService.cs" />

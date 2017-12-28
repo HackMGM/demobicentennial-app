@@ -31,9 +31,21 @@ namespace MapsuiFormsSample.Services
 
         public async Task<List<Marker>> GetAllMarkers()
         {
+            Debug.WriteLine("MarkerService.GetAllMarkers() called.");
 
             List<MarkerDto> markerDtos = null;
-            var json = await _client.GetStringAsync($"/?q=mobileapi/markersjson.json");
+            var json = string.Empty;
+            try
+            {
+                json = await _client.GetStringAsync($"/?q=mobileapi/markersjson.json");
+                Debug.WriteLine("Loaded marker json:");
+                Debug.WriteLine(json);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Error fetching markersjson: " + e.ToString());
+                // TODO: Show error to user.
+            }
             try
             {
                 markerDtos = JsonConvert.DeserializeObject<List<MarkerDto>>(json);
@@ -63,14 +75,9 @@ namespace MapsuiFormsSample.Services
                                                                                       + " and county: " + _htmlHelper.ExtractText(markerDto.County);
                     markersList.Add(new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description));
                 }
-                catch (InvalidCastException e)
-                {
-                    Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label + " exception: " + e.ToString());
-                }
                 catch (Exception e)
                 {
-                    // TODO: Show user
-                    Debug.WriteLine("Exception: " + e.ToString());
+                    Debug.WriteLine("Ignoring marker with bad or missing GPS location data! GPS coordinates are in invalid format for this marker: " + label + " exception: " + e.ToString());
                 }
 
             }

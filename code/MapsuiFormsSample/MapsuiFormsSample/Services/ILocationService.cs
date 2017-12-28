@@ -5,6 +5,6 @@ namespace MapsuiFormsSample.Services
 {
     public interface ILocationService
     {
-        Task StartListening();
+        Task StartListening(ILocationServiceChangeWatcher mapPage);
     }
 }
