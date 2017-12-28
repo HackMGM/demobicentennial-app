@@ -25,12 +25,14 @@ namespace MapsuiFormsSample
     public partial class MapPage
     {
         private IMarkerService _markerService;
+        private ILocationService _locationService;
         private MapsUIView _mapControl = null;
         private List<Marker> _markersList = new List<Marker>();
 
         public MapPage()
         {
             _markerService = new MarkerService();
+            _locationService = new LocationService();
             GenerateMap();
 
         }
@@ -48,6 +50,7 @@ namespace MapsuiFormsSample
             if (IsLocationAvailable())
             {
                 userPosition = await GetCurrentLocation();
+                _locationService.StartListening();
             }
             else
             {
@@ -99,13 +102,17 @@ namespace MapsuiFormsSample
                     var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
                     //Best practice to always check that the key exists
                     if (results.ContainsKey(Permission.Location))
+                    {
                         status = results[Permission.Location];
+                    }
+                    _locationService.StartListening();
                 }
 
                 if (status == PermissionStatus.Granted)
                 {
                     var results = await CrossGeolocator.Current.GetPositionAsync(TimeSpan.FromSeconds(20));
                     Debug.WriteLine("Lat: " + results.Latitude + " Long: " + results.Longitude);
+                    _locationService.StartListening();
                 }
                 else if (status != PermissionStatus.Unknown)
                 {
@@ -122,7 +129,7 @@ namespace MapsuiFormsSample
 #endif
 
 #if __MOBILE__
-        // Begin from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+        // Begin adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
         public async Task<Position> GetCurrentLocation()
         {
             Position position = null;
@@ -135,7 +142,7 @@ namespace MapsuiFormsSample
 
                 if (position != null)
                 {
-                    Debug.WriteLine("TMP DEBUG: CACHED Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
+                    Debug.WriteLine("TMP DEBUG: USING CACHED Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
                     return position;
                 }
 
@@ -158,7 +165,7 @@ namespace MapsuiFormsSample
             }
 
         }
-        // End from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+        // End adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
 #endif
 
         public bool IsLocationAvailable()

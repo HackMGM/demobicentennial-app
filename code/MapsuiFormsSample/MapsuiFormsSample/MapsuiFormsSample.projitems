@@ -25,6 +25,8 @@
       <DependentUpon>MarkerInfoPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ILocationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\LocationService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestData\TestMarkerData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\MarkerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\IMarkerService.cs" />
@@ -55,7 +57,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Services\" />
     <Folder Include="$(MSBuildThisFileDirectory)DataObjects\Dto\" />
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
   </ItemGroup>
