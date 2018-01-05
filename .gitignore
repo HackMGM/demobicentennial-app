@@ -40,3 +40,7 @@ Thumbs.db
 *.dotCover
 code/MapsuiFormsSample/MapsuiFormsSample.UWP/MapsuiFormsSample.UWP.nuget.props
 code/MapsuiFormsSample/MapsuiFormsSample.UWP/project.lock.json
+code/.vs/MapsuiFormsSample/v15/Server/sqlite3/db.lock
+*.ide
+code/.vs/MapsuiFormsSample/v15/Server/sqlite3/storage.ide-shm
+code/.vs/MapsuiFormsSample/v15/Server/sqlite3/storage.ide-wal
