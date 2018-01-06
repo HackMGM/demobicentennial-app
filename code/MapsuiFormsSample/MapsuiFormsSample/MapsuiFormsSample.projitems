@@ -34,6 +34,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataObjects\Dto\MarkerDto.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\IHtmlHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\HtmlHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataObjects\UI\MarkerListViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\DistanceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)MainPage.xaml">
@@ -60,5 +62,6 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)DataObjects\Dto\" />
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
+    <Folder Include="$(MSBuildThisFileDirectory)DataObjects\UI\" />
   </ItemGroup>
 </Project>
