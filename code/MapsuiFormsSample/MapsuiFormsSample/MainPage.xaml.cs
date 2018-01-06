@@ -5,20 +5,26 @@ using System.Net.Http;
 using System.Collections.Generic;
 using MapsuiFormsSample.DataObjects;
 using Microsoft.CSharp.RuntimeBinder;
+using MapsuiFormsSample.Services;
 
 namespace MapsuiFormsSample
 {
     public partial class MainPage
     {
-        HttpClient client = null;
+        //HttpClient client = null;
+        private IMarkerService _markerService;
 
         public MainPage()
         {
+            _markerService = new MarkerService();
+
             // Required line when using XAML file.
             InitializeComponent();
+            /*
             client = new HttpClient();
             client.BaseAddress = new Uri($"http://13.82.106.207/");
-            ShowTestButton();
+            */
+            //ShowTestButton();
             ShowMarkersList();
         }
 
@@ -44,10 +50,12 @@ namespace MapsuiFormsSample
         async void ShowMarkersList()
         {
 
-            var json = await client.GetStringAsync($"/?q=mobileapi/node.json");
-            dynamic markers = JsonConvert.DeserializeObject(json);
-            List<Marker> markersList = new List<Marker>();
-            foreach (dynamic marker in markers)
+            //var json = await client.GetStringAsync($"/?q=mobileapi/node.json");
+            //dynamic markers = JsonConvert.DeserializeObject(json);
+            //List<Marker> markersList = new List<Marker>();
+            List<Marker> markersList = await _markerService.GetAllMarkers();
+            /*
+            foreach (Marker marker in markers)
             {
                 if ("historic_marker".Equals(marker.type.ToString()))
                 {
@@ -59,6 +67,19 @@ namespace MapsuiFormsSample
                                               ));
                 }
             }
+            */
+            /*foreach (Marker marker in markersList)
+            {
+                
+                markersList.Add(new Marker(marker.Title,
+                                       "" , // empty node id for now
+
+                                           marker.LocationSphericalMercator,
+                                           marker.Title
+                                      ));
+                
+            }*/
+
 
             // Create the ListView.
             ListView listView = new ListView
@@ -113,7 +134,8 @@ namespace MapsuiFormsSample
                 {
                     return;
                 }
-                ShowMarkerLocation(marker.Title, "/?q=mobileapi/node/" + marker.NodeId);
+                // TODO: Show marker detail screen
+                //ShowMarkerLocation(marker.Title, "/?q=mobileapi/node/" + marker.NodeId);
                 listView.SelectedItem = null;
             };
 
@@ -124,9 +146,10 @@ namespace MapsuiFormsSample
         async void OnButtonClicked(object sender, EventArgs e)
         {
             // TODO: load the specific item clicked.
-            ShowMarkerLocation("Test hardcoded marker", "/?q=mobileapi/node/2.json");
+           // ShowMarkerLocation("Test hardcoded marker", "/?q=mobileapi/node/2.json");
         }
 
+        /*
         async void ShowMarkerLocation(string title, string url)
         {
             var json = await client.GetStringAsync(url);
@@ -155,6 +178,7 @@ namespace MapsuiFormsSample
                 await DisplayAlert("Alert", "GPS coordinates are in invalid format for this marker", "OK");
             }
         }
+        */
 
 
     }

@@ -18,6 +18,8 @@ namespace MapsuiFormsSample.DataObjects
         public Point LocationSphericalMercator { private set; get; }
         public string NodeId { private set; get; }
         public string Title { private set; get; }
+        public double Latitude { set; get; }
+        public double Longitude { set; get; }
 
 
     }

@@ -73,7 +73,10 @@ namespace MapsuiFormsSample.Services
                     Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
                     string description = "Marker is located in city of " + _htmlHelper.ExtractText(markerDto.City)
                                                                                       + " and county: " + _htmlHelper.ExtractText(markerDto.County);
-                    markersList.Add(new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description));
+                    var marker = new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description);
+                    marker.Latitude = lat;
+                    marker.Longitude = longitude;
+                    markersList.Add(marker);
                 }
                 catch (Exception e)
                 {
