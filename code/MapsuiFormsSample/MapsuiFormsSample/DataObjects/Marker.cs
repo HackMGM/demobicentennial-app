@@ -4,7 +4,9 @@ namespace MapsuiFormsSample.DataObjects
 {
     public class Marker
     {
-        public Marker(string title, string nid, Point locationSphericalMercator, string description)
+        public Marker(string title, string nid, 
+                      Point locationSphericalMercator, 
+                      string description)
         {
             this.Description = description;
             this.LocationSphericalMercator = locationSphericalMercator;
