@@ -3,7 +3,8 @@ using System;
 
 namespace MapsuiFormsSample.Services
 {
-    public interface ILocationServiceChangeWatcher
+    // TODO: Remove if can't make LocationService take this instead of MainPage.
+    public interface ILocationServiceChangeWatcher 
     {
         void PositionChanged(object sender, PositionEventArgs e);
     }

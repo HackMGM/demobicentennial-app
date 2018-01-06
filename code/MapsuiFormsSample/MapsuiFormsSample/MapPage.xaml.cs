@@ -22,6 +22,7 @@ using Plugin.Geolocator.Abstractions;
 
 namespace MapsuiFormsSample
 {
+    /*
     public partial class MapPage : ILocationServiceChangeWatcher
     {
         private IMarkerService _markerService;
@@ -240,26 +241,6 @@ namespace MapsuiFormsSample
         }
 
 
-        /* Unmerged change from project 'MapsuiFormsSample.UWP'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
-
-        /* Unmerged change from project 'MapsuiFormsSample.iOS'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
-
-        /* Unmerged change from project 'MapsuiFormsSample'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
         public async Task<ILayer> LoadDataAndCreateLayerAsync(Position userPosition)
         {
             //string markersJson = TestMarkerData.JsonTestData;
@@ -312,5 +293,7 @@ namespace MapsuiFormsSample
                 Halo = new Pen(Color.Red, 4)
             };
         }
-    }
+
+}
+  */  
 }
