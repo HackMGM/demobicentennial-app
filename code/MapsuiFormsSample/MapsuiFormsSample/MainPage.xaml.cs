@@ -109,7 +109,7 @@ namespace MapsuiFormsSample
                 })
             };
 
-            listView.ItemTapped += (sender, args) =>
+            listView.ItemTapped += async (sender, args) => 
             {
                 Marker marker = args.Item as Marker;
                 if (marker == null)
@@ -118,6 +118,8 @@ namespace MapsuiFormsSample
                 }
                 // TODO: Show marker detail screen
                 //ShowMarkerLocation(marker.Title, "/?q=mobileapi/node/" + marker.NodeId);
+
+                await Navigation.PushAsync(new MarkerInfoPage(marker));
                 listView.SelectedItem = null;
             };
 

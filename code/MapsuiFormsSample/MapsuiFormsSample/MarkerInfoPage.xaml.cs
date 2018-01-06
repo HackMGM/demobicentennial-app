@@ -13,21 +13,24 @@ namespace MapsuiFormsSample
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MarkerInfoPage : ContentPage
     {
+        private Marker _marker;
+
         public MarkerInfoPage(Marker marker)
         {
+            _marker = marker;
             this.Title = marker.Title;
             InitializeComponent();
 
             Label testLabel = new Label
             {
                 Text = "Description: " + marker.Description
-                            + "\n\nLocation: X: " + marker.LocationSphericalMercator.X 
+                            + "\n\nLocation: X: " + marker.LocationSphericalMercator.X
                             + " Y: " + marker.LocationSphericalMercator.Y,
                 HorizontalOptions = LayoutOptions.Center
             };
             Button button = new Button
             {
-                Text = "Google Maps (button not yet functional)",
+                Text = "Get Directions with Google Maps",
                 BorderWidth = 1,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.CenterAndExpand
@@ -39,9 +42,14 @@ namespace MapsuiFormsSample
 
         }
 
-        async void OnGoogleMapsButtonClicked(object sender, EventArgs e)
+        void OnGoogleMapsButtonClicked(object sender, EventArgs e)
         {
             // TODO: load google maps so directions can be gotten.
+
+            // Open URL like
+            // https://www.google.com/maps/?q=32.37685,-86.30078333
+            Device.OpenUri(new Uri("https://www.google.com/maps/?q="
+                                   + _marker.Latitude + "," + _marker.Longitude));
         }
     }
 }
