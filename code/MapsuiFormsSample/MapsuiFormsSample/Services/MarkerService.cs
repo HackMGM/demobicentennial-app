@@ -15,8 +15,8 @@ namespace MapsuiFormsSample.Services
 {
     public class MarkerService : IMarkerService
     {
-        HttpClient _client = null;
-        IHtmlHelper _htmlHelper;
+        private HttpClient _client = null;
+        private IHtmlHelper _htmlHelper;
 
         public MarkerService()
         {
@@ -25,15 +25,28 @@ namespace MapsuiFormsSample.Services
             _client.BaseAddress = new Uri($"http://13.82.106.207/");
 
             _htmlHelper = new HtmlHelper();
+
         }
 
 
 
         public async Task<List<Marker>> GetAllMarkers()
         {
+            Debug.WriteLine("MarkerService.GetAllMarkers() called.");
 
             List<MarkerDto> markerDtos = null;
-            var json = await _client.GetStringAsync($"/?q=mobileapi/markersjson.json");
+            var json = string.Empty;
+            try
+            {
+                json = await _client.GetStringAsync($"/?q=mobileapi/markersjson.json");
+                Debug.WriteLine("Loaded marker json:");
+                Debug.WriteLine(json);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Error fetching markersjson: " + e.ToString());
+                // TODO: Show error to user.
+            }
             try
             {
                 markerDtos = JsonConvert.DeserializeObject<List<MarkerDto>>(json);
@@ -61,16 +74,14 @@ namespace MapsuiFormsSample.Services
                     Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
                     string description = "Marker is located in city of " + _htmlHelper.ExtractText(markerDto.City)
                                                                                       + " and county: " + _htmlHelper.ExtractText(markerDto.County);
-                    markersList.Add(new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description));
-                }
-                catch (InvalidCastException e)
-                {
-                    Debug.WriteLine("GPS coordinates are in invalid format for this marker: " + label + " exception: " + e.ToString());
+                    var marker = new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description);
+                    marker.Latitude = lat;
+                    marker.Longitude = longitude;
+                    markersList.Add(marker);
                 }
                 catch (Exception e)
                 {
-                    // TODO: Show user
-                    Debug.WriteLine("Exception: " + e.ToString());
+                    Debug.WriteLine("Ignoring marker with bad or missing GPS location data! GPS coordinates are in invalid format for this marker: " + label + " exception: " + e.ToString());
                 }
 
             }

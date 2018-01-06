@@ -8,7 +8,14 @@ namespace MapsuiFormsSample
 		{
 			InitializeComponent();
 
-			MainPage = new NavigationPage(new MapPage());
+            // Map page adds extra complexity
+            // (and instability of having map jump around if GPS signal is wonky)
+            // in trying to make
+            // it the primary way user interacts with markers
+            // usiing list instead
+            //MainPage = new NavigationPage(new MapPage());
+
+            MainPage = new NavigationPage(new MainPage());
 		}
 
 		protected override void OnStart ()

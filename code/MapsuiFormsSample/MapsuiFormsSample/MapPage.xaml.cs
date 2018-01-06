@@ -22,17 +22,51 @@ using Plugin.Geolocator.Abstractions;
 
 namespace MapsuiFormsSample
 {
-    public partial class MapPage
+    /*
+    public partial class MapPage : ILocationServiceChangeWatcher
     {
         private IMarkerService _markerService;
+        private ILocationService _locationService;
         private MapsUIView _mapControl = null;
+        private ILayer _layer = null;
+        private bool _initialLoadCompleted = false;
         private List<Marker> _markersList = new List<Marker>();
 
         public MapPage()
         {
             _markerService = new MarkerService();
+            _locationService = new LocationService();
             GenerateMap();
 
+        }
+
+
+        public async void PositionChanged(object sender, PositionEventArgs e)
+        {
+
+            //If updating the UI, ensure you invoke on main thread
+            var position = e.Position;
+            var output = "PositionChanged() called. Full: Lat: " + position.Latitude + " Long: " + position.Longitude;
+            output += "\n" + $"Time: {position.Timestamp}";
+            output += "\n" + $"Heading: {position.Heading}";
+            output += "\n" + $"Speed: {position.Speed}";
+            output += "\n" + $"Accuracy: {position.Accuracy}";
+            output += "\n" + $"Altitude: {position.Altitude}";
+            output += "\n" + $"Altitude Accuracy: {position.AltitudeAccuracy}";
+            Debug.WriteLine(output);
+            if (_initialLoadCompleted)
+            {
+                // Redraw map
+
+                _mapControl.NativeMap.Layers.Remove(_layer);
+                _layer = await GenerateLayer(position);
+
+                _mapControl.NativeMap.Layers.Add(_layer);
+            }
+            else
+            {
+                Debug.WriteLine("Initial load not completed so skipping map redraw");
+            }
         }
 
         public async void GenerateMap()
@@ -48,6 +82,7 @@ namespace MapsuiFormsSample
             if (IsLocationAvailable())
             {
                 userPosition = await GetCurrentLocation();
+                _locationService.StartListening(this);
             }
             else
             {
@@ -55,8 +90,8 @@ namespace MapsuiFormsSample
             }
 #endif
 
-            ILayer layer = await CreateLayerAsync(userPosition);
-            _mapControl.NativeMap.Layers.Add(layer);
+            _layer = await LoadDataAndCreateLayerAsync(userPosition);
+            _mapControl.NativeMap.Layers.Add(_layer);
 
             // Set the center of the viewport to the coordinate. The UI will refresh automatically
             // mapControl.NativeMap.NavigateTo(sphericalMercatorCoordinate);
@@ -80,6 +115,7 @@ namespace MapsuiFormsSample
             };
 
             ContentGrid.Children.Add(_mapControl);
+            _initialLoadCompleted = true;
         }
 
 #if __MOBILE__
@@ -99,13 +135,17 @@ namespace MapsuiFormsSample
                     var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
                     //Best practice to always check that the key exists
                     if (results.ContainsKey(Permission.Location))
+                    {
                         status = results[Permission.Location];
+                    }
+                    _locationService.StartListening(this);
                 }
 
                 if (status == PermissionStatus.Granted)
                 {
                     var results = await CrossGeolocator.Current.GetPositionAsync(TimeSpan.FromSeconds(20));
                     Debug.WriteLine("Lat: " + results.Latitude + " Long: " + results.Longitude);
+                    _locationService.StartListening(this);
                 }
                 else if (status != PermissionStatus.Unknown)
                 {
@@ -122,7 +162,7 @@ namespace MapsuiFormsSample
 #endif
 
 #if __MOBILE__
-        // Begin from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+        // Begin adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
         public async Task<Position> GetCurrentLocation()
         {
             Position position = null;
@@ -135,7 +175,7 @@ namespace MapsuiFormsSample
 
                 if (position != null)
                 {
-                    Debug.WriteLine("TMP DEBUG: CACHED Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
+                    Debug.WriteLine("TMP DEBUG: USING CACHED Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
                     return position;
                 }
 
@@ -158,7 +198,7 @@ namespace MapsuiFormsSample
             }
 
         }
-        // End from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+        // End adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
 #endif
 
         public bool IsLocationAvailable()
@@ -201,41 +241,26 @@ namespace MapsuiFormsSample
         }
 
 
-        /* Unmerged change from project 'MapsuiFormsSample.UWP'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
+        public async Task<ILayer> LoadDataAndCreateLayerAsync(Position userPosition)
+        {
+            //string markersJson = TestMarkerData.JsonTestData;
+            _markersList = await _markerService.GetAllMarkers();
+            return await GenerateLayer(userPosition);
+        }
 
-        /* Unmerged change from project 'MapsuiFormsSample.iOS'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
-
-        /* Unmerged change from project 'MapsuiFormsSample'
-        Before:
-                public ILayer CreateLayer(Position userPosition)
-        After:
-                public ILayer CreateLayerAsync(Position userPosition)
-        */
-        public async Task<ILayer> CreateLayerAsync(Position userPosition)
+        private async Task<ILayer> GenerateLayer(Position userPosition)
         {
             var memoryProvider = new MemoryProvider();
             ShowUserCurrentLocation(memoryProvider, userPosition);
-            //string markersJson = TestMarkerData.JsonTestData;
-            _markersList = await _markerService.GetAllMarkers();
             foreach (Marker marker in _markersList)
             {
-                var featureWithDefaultStyle = new Feature { Geometry = 
-                    marker.LocationSphericalMercator };
+                var featureWithDefaultStyle = new Feature
+                {
+                    Geometry =
+                    marker.LocationSphericalMercator
+                };
                 featureWithDefaultStyle.Styles.Add(new LabelStyle { Text = marker.Title });
                 memoryProvider.Features.Add(featureWithDefaultStyle);
-
-
-
             }
 
             return new MemoryLayer { Name = "Points with labels", DataSource = memoryProvider };
@@ -268,5 +293,7 @@ namespace MapsuiFormsSample
                 Halo = new Pen(Color.Red, 4)
             };
         }
-    }
+
+}
+  */  
 }
