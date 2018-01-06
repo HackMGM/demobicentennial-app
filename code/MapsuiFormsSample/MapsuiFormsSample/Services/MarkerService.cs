@@ -15,8 +15,8 @@ namespace MapsuiFormsSample.Services
 {
     public class MarkerService : IMarkerService
     {
-        HttpClient _client = null;
-        IHtmlHelper _htmlHelper;
+        private HttpClient _client = null;
+        private IHtmlHelper _htmlHelper;
 
         public MarkerService()
         {
@@ -25,6 +25,7 @@ namespace MapsuiFormsSample.Services
             _client.BaseAddress = new Uri($"http://13.82.106.207/");
 
             _htmlHelper = new HtmlHelper();
+
         }
 
 

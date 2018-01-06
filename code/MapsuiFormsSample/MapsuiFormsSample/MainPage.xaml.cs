@@ -1,22 +1,29 @@
 ﻿using System;
 using Xamarin.Forms;
-using Newtonsoft.Json;
-using System.Net.Http;
 using System.Collections.Generic;
 using MapsuiFormsSample.DataObjects;
-using Microsoft.CSharp.RuntimeBinder;
 using MapsuiFormsSample.Services;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Plugin.Permissions.Abstractions;
+using Plugin.Permissions;
+#if __MOBILE__
+using Plugin.Geolocator;
+using Plugin.Geolocator.Abstractions;
+#endif
 
 namespace MapsuiFormsSample
 {
-    public partial class MainPage
+    public partial class MainPage : ILocationServiceChangeWatcher
     {
         //HttpClient client = null;
         private IMarkerService _markerService;
+        private ILocationService _locationService;
 
         public MainPage()
         {
             _markerService = new MarkerService();
+            _locationService = new LocationService();
 
             // Required line when using XAML file.
             InitializeComponent();
@@ -26,7 +33,121 @@ namespace MapsuiFormsSample
             */
             //ShowTestButton();
             ShowMarkersList();
+
+            InitLocationChangeListener();
         }
+
+        private async void InitLocationChangeListener()
+        {
+            Position userPosition = null;
+#if __MOBILE__
+            if (IsLocationAvailable())
+            {
+                userPosition = await GetCurrentLocation();
+                _locationService.StartListening(this);
+            }
+            else
+            {
+                RequestLocationPermission();
+            }
+#endif
+        }
+
+#if __MOBILE__
+        // Begin adapted from https://github.com/jamesmontemagno/permissionsplugin
+        public async void RequestLocationPermission()
+        {
+            try
+            {
+                var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Location);
+                if (status != PermissionStatus.Granted)
+                {
+                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
+                    {
+                        await DisplayAlert("Need location", "Location needed to allow you to play this game", "OK");
+                    }
+
+                    var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
+                    //Best practice to always check that the key exists
+                    if (results.ContainsKey(Permission.Location))
+                    {
+                        status = results[Permission.Location];
+                    }
+                    _locationService.StartListening(this);
+                }
+
+                if (status == PermissionStatus.Granted)
+                {
+                    var results = await CrossGeolocator.Current.GetPositionAsync(TimeSpan.FromSeconds(20));
+                    Debug.WriteLine("Lat: " + results.Latitude + " Long: " + results.Longitude);
+                    _locationService.StartListening(this);
+                }
+                else if (status != PermissionStatus.Unknown)
+                {
+                    await DisplayAlert("Location Denied", "Can not continue, try again.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Debug.WriteLine("Error: " + ex);
+            }
+        }
+        // End adapted from https://github.com/jamesmontemagno/permissionsplugin
+#endif
+
+#if __MOBILE__
+        // Begin adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+        public async Task<Position> GetCurrentLocation()
+        {
+            Position position = null;
+            try
+            {
+                var locator = CrossGeolocator.Current;
+                locator.DesiredAccuracy = 100;
+
+                position = await locator.GetLastKnownLocationAsync();
+
+                if (position != null)
+                {
+                    Debug.WriteLine("TMP DEBUG: USING CACHED Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
+                    return position;
+                }
+
+                if (!locator.IsGeolocationAvailable || !locator.IsGeolocationEnabled)
+                {
+                    //not available or enabled
+                    Debug.WriteLine("Location not available or enabled.");
+                    return null;
+                }
+
+                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(20), null, true);
+                Debug.WriteLine("TMP DEBUG: Uncached Position: Lat: " + position.Latitude + " Long: " + position.Longitude);
+                return position;
+            }
+            catch (Exception ex)
+            {
+                //Display error as we have timed out or can't get location.
+                Debug.WriteLine("Error getting user's current location: " + ex);
+                return null;
+            }
+
+        }
+        // End adapted from https://jamesmontemagno.github.io/GeolocatorPlugin/CurrentLocation.html
+#endif
+
+        public bool IsLocationAvailable()
+        {
+#if __MOBILE__
+            if (!CrossGeolocator.IsSupported)
+                return false;
+
+            return CrossGeolocator.Current.IsGeolocationAvailable;
+#else
+                return false;
+#endif
+        }
+
 
         void ShowTestButton()
         {
@@ -49,37 +170,7 @@ namespace MapsuiFormsSample
 
         async void ShowMarkersList()
         {
-
-            //var json = await client.GetStringAsync($"/?q=mobileapi/node.json");
-            //dynamic markers = JsonConvert.DeserializeObject(json);
-            //List<Marker> markersList = new List<Marker>();
             List<Marker> markersList = await _markerService.GetAllMarkers();
-            /*
-            foreach (Marker marker in markers)
-            {
-                if ("historic_marker".Equals(marker.type.ToString()))
-                {
-                    markersList.Add(new Marker(marker.title.ToString(),
-                                               marker.nid.ToString(),
-                                               // empty point for now
-                                               new Mapsui.Geometries.Point(),
-                                               "" // empty description for now
-                                              ));
-                }
-            }
-            */
-            /*foreach (Marker marker in markersList)
-            {
-                
-                markersList.Add(new Marker(marker.Title,
-                                       "" , // empty node id for now
-
-                                           marker.LocationSphericalMercator,
-                                           marker.Title
-                                      ));
-                
-            }*/
-
 
             // Create the ListView.
             ListView listView = new ListView
@@ -146,7 +237,36 @@ namespace MapsuiFormsSample
         async void OnButtonClicked(object sender, EventArgs e)
         {
             // TODO: load the specific item clicked.
-           // ShowMarkerLocation("Test hardcoded marker", "/?q=mobileapi/node/2.json");
+            // ShowMarkerLocation("Test hardcoded marker", "/?q=mobileapi/node/2.json");
+        }
+
+        public async void PositionChanged(object sender, PositionEventArgs e)
+        {
+            Debug.WriteLine("PositionChanged called");
+            //If updating the UI, ensure you invoke on main thread
+            var position = e.Position;
+            var output = "PositionChanged() called. Full: Lat: " + position.Latitude + " Long: " + position.Longitude;
+            output += "\n" + $"Time: {position.Timestamp}";
+            output += "\n" + $"Heading: {position.Heading}";
+            output += "\n" + $"Speed: {position.Speed}";
+            output += "\n" + $"Accuracy: {position.Accuracy}";
+            output += "\n" + $"Altitude: {position.Altitude}";
+            output += "\n" + $"Altitude Accuracy: {position.AltitudeAccuracy}";
+            Debug.WriteLine(output);
+            /*if (_initialLoadCompleted)
+            {
+                // Redraw map
+
+                _mapControl.NativeMap.Layers.Remove(_layer);
+                _layer = await GenerateLayer(position);
+
+                _mapControl.NativeMap.Layers.Add(_layer);
+            }
+            else
+            {
+                Debug.WriteLine("Initial load not completed so skipping map redraw");
+            }
+            */
         }
 
         /*
