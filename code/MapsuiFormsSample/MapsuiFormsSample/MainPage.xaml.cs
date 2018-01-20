@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Xamarin.Forms;
 using System.Collections.Generic;
 using MapsuiFormsSample.DataObjects;
@@ -90,13 +91,17 @@ namespace MapsuiFormsSample
                     */
 
                     Double distInMeters = DistanceHelper.DistanceInMetres((double)_currentLat, (double)_currentLong, marker.Latitude, marker.Longitude);
-                    Double distInMiles = distInMeters * 0.000621371;
-                    item.DistanceAway = distInMiles + " mi";
-
+                    Decimal distInMiles = (Decimal)(distInMeters * 0.000621371);
+                    Decimal distRounded = Decimal.Round(distInMiles, 1);
+                    item.DistanceAway = distRounded.ToString() + " mi";
+                    item.DistanceAwayDecimal = distRounded;
                 }
                 else
                 {
                     item.DistanceAway = "Unknown";
+                    item.DistanceAwayDecimal = 0;
+
+
                 }
 
 
@@ -202,6 +207,8 @@ namespace MapsuiFormsSample
 
             // Refresh marker list and recalculate distance away.
             List<MarkerListViewItem> markersWithDistances = GetMarkersWithDistances(_markersList);
+            markersWithDistances.Sort((m1, m2) => m1.DistanceAwayDecimal.CompareTo(m2.DistanceAwayDecimal));
+
             _listView.ItemsSource = markersWithDistances;
             /*if (_initialLoadCompleted)
             {
