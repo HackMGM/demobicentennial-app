@@ -4,6 +4,9 @@ using Android.OS;
 using Xamarin.Forms.Platform.Android;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace MapsuiFormsSample.Droid
 {
@@ -16,8 +19,10 @@ namespace MapsuiFormsSample.Droid
 			ToolbarResource = Resource.Layout.Toolbar; 
 
 			base.OnCreate (bundle);
+            
+            AppCenter.Start("004c5230-3779-42af-90ae-90cc9d1a7a08", typeof(Analytics), typeof(Crashes));
 
-			Xamarin.Forms.Forms.Init (this, bundle);
+            Xamarin.Forms.Forms.Init (this, bundle);
 			LoadApplication (new App ());
 		}
 
