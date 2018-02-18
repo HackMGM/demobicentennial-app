@@ -28,9 +28,37 @@ namespace MapsuiFormsSample.Services
 
         }
 
+        /*
+        public async Task<MarkerDetailsDto> GetMarkerDetails(int nodeId)
+        {
+            Debug.WriteLine("MarkerService.GetMarkerDetails() called.");
 
+            MarkerDetailsDto dto = null;
+            var json = string.Empty;
+            try
+            {
+                json = await _client.GetStringAsync($"/?q=mobileapi/node/" + nodeId.ToString() + ".json");
+                Debug.WriteLine("Loaded marker json:");
+                Debug.WriteLine(json);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Error fetching markersjson: " + e.ToString());
+                // TODO: Show error to user.
+            }
+            try
+            {
+                markerDtos = JsonConvert.DeserializeObject<List<MarkerDto>>(json);
+            }
+            catch (JsonReaderException e)
+            {
+                Debug.WriteLine("Error parsing markersjson: " + e.ToString());
 
-        public async Task<List<Marker>> GetAllMarkers()
+            }
+        }
+        */
+
+            public async Task<List<Marker>> GetAllMarkers()
         {
             Debug.WriteLine("MarkerService.GetAllMarkers() called.");
 
@@ -57,10 +85,8 @@ namespace MapsuiFormsSample.Services
 
             }
             List<Marker> markersList = new List<Marker>();
-            int tempNodeId = 1;
             foreach (MarkerDto markerDto in markerDtos)
             {
-
                 string label = _htmlHelper.ExtractText(markerDto.title);
 
                 try
@@ -74,7 +100,7 @@ namespace MapsuiFormsSample.Services
                     Point sphericalMercatorCoordinate = SphericalMercator.FromLonLat(currentMarker.X, currentMarker.Y);
                     string description = "Marker is located in city of " + _htmlHelper.ExtractText(markerDto.City)
                                                                                       + " and county: " + _htmlHelper.ExtractText(markerDto.County);
-                    var marker = new Marker(label, tempNodeId.ToString(), sphericalMercatorCoordinate, description);
+                    var marker = new Marker(label, markerDto.Nid, sphericalMercatorCoordinate, description);
                     marker.Latitude = lat;
                     marker.Longitude = longitude;
                     markersList.Add(marker);

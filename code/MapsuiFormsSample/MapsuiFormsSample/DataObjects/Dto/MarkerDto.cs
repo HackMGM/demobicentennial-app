@@ -6,6 +6,8 @@ namespace MapsuiFormsSample.DataObjects.Dto
     public class MarkerDto
     {
         public string City { set; get; }
+        
+        public string Nid { set; get; }
 
         public string County { set; get; }
 
